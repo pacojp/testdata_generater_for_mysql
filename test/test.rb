@@ -79,7 +79,6 @@ CREATE TABLE tests (
       procs
     )
 
-
     # 作成データのチェック
     cnt_all = CNT_BRAND * SHOP_PER_BRAND
     assert_count cnt_all
