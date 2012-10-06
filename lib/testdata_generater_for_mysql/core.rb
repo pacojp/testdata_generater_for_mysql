@@ -4,6 +4,8 @@ require 'progressbar'
 require 'mysql2'
 
 #
+# TODO 以下の削除 サンプルの作成
+#
 # 使い方
 #
 # ・まずは本ファイルをrequiresします
