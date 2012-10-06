@@ -27,23 +27,7 @@ class TestTestdataGeneraterForMysql < Test::Unit::TestCase
     setup_mysql_settings(:host => "127.0.0.1", :username => "root",:database=>'testdata_generater_for_mysql_test')
     insert_per_rows = 1000
 
-    loops = [
-      [:brand_id,(1..BRAND_COUNT)],
-      [:user_id, (1..USER_PER_BRAND)]
-    ]
-
-    procs = {
-      :brand_id    => Proc.new{|v|v[:brand_id]},
-      :user_id     => Proc.new{|v|v[:user_id]},
-      :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:user_id]}_name"},
-      :value1      => Proc.new{rand(10000)},
-      :value2      => Proc.new{rand(10000)},
-      :value_nil   => Proc.new{nil},
-      :value_true  => Proc.new{true},
-      :value_false => Proc.new{false},
-      :created_at  => Proc.new{'NOW()'},
-    }
-
+    # テーブル作成
     query "DROP TABLE IF EXISTS tests;"
     query "
 CREATE TABLE tests (
@@ -62,6 +46,23 @@ CREATE TABLE tests (
   KEY `idx01` USING BTREE (`brand_id`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 "
+
+    # データ作成
+    loops = [
+      [:brand_id,(1..BRAND_COUNT)],
+      [:user_id, (1..USER_PER_BRAND)]
+    ]
+    procs = {
+      :brand_id    => Proc.new{|v|v[:brand_id]},
+      :user_id     => Proc.new{|v|v[:user_id]},
+      :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:user_id]}_name"},
+      :value1      => Proc.new{rand(10000)},
+      :value2      => Proc.new{rand(10000)},
+      :value_nil   => Proc.new{nil},
+      :value_true  => Proc.new{true},
+      :value_false => Proc.new{false},
+      :created_at  => Proc.new{'NOW()'},
+    }
     create_rows(
       'tests',
       loops,
