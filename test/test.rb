@@ -67,6 +67,8 @@ CREATE TABLE tests (
       loops,
       procs
     )
+    
+    # 作成データのチェック
     cnt_all = BRAND_COUNT * USER_PER_BRAND
     assert_equal cnt_all,       count
     assert_equal USER_PER_BRAND,count "brand_id = 3"
