@@ -16,6 +16,11 @@ class TestTestdataGeneraterForMysql < Test::Unit::TestCase
 
   BRAND_COUNT     = 13
   USER_PER_BRAND  = 10_000
+  
+  def count(where=nil)
+    where = where ? " WHERE #{where} " : ''
+    query("SELECT COUNT(*) AS cnt FROM tests #{where}").first['cnt']
+  end
 
   def test
     disable_progress_bar
@@ -62,26 +67,16 @@ CREATE TABLE tests (
       loops,
       procs
     )
-    count = query("SELECT COUNT(*) AS cnt FROM tests").first['cnt']
     cnt_all = BRAND_COUNT * USER_PER_BRAND
-    assert_equal count,cnt_all
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE brand_id = 3").first['cnt']
-    assert_equal count,USER_PER_BRAND
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE user_id = 3").first['cnt']
-    assert_equal count,BRAND_COUNT
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE value2 IS NULL").first['cnt']
-    assert_equal count,0
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE value3 IS NULL").first['cnt']
-    assert_equal count,cnt_all
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE value_nil IS NULL").first['cnt']
-    assert_equal count,cnt_all
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE created_at IS NULL").first['cnt']
-    assert_equal count,0
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE name = '1_1_name'").first['cnt']
-    assert_equal count,1
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE value_true = 1").first['cnt']
-    assert_equal count,cnt_all
-    count = query("SELECT COUNT(*) AS cnt FROM tests WHERE value_false = 0").first['cnt']
-    assert_equal count,cnt_all
+    assert_equal cnt_all,       count
+    assert_equal USER_PER_BRAND,count "brand_id = 3"
+    assert_equal BRAND_COUNT,   count "user_id = 3"
+    assert_equal 0,             count "value2 IS NULL"
+    assert_equal cnt_all,       count "value3 IS NULL"
+    assert_equal cnt_all,       count "value_nil IS NULL"
+    assert_equal 0,             count "created_at IS NULL"
+    assert_equal 1,             count "name = '1_1_name"
+    assert_equal cnt_all,       count "value_true = 1"
+    assert_equal cnt_all,       count "value_false = 0"
   end
 end
