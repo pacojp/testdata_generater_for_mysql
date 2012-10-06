@@ -82,7 +82,6 @@ CREATE TABLE tests (
 
     # 作成データのチェック
     cnt_all = CNT_BRAND * SHOP_PER_BRAND
-
     assert_count cnt_all
     assert_count SHOP_PER_BRAND, "brand_id = 3"
     assert_count CNT_BRAND,      "shop_id = 3"
