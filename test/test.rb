@@ -6,7 +6,7 @@ require 'test/unit'
 require 'Fileutils'
 
 #
-# localhostにtestdata_generater_for_mysql_testというテーブルを作成し
+# localhostにtestdata_generater_for_mysql_testというデータベースを作成し
 # rootのパスワードなしでアクセスできるようにしておいてください
 #
 
