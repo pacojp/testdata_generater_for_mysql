@@ -67,7 +67,8 @@ module TestdataGeneraterForMysql
     end
     @__table_name = table_name
     @__insert_per_rows ||= 100
-    @__insert_values ||= []
+    raise 'something wrong' if @__insert_values && @__insert_values.size > 0
+    @__insert_values = []
     @__inserted_rows = 0
     @__col_procs = col_procs
     unless @__disable_progress_bar
