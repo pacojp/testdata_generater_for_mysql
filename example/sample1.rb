@@ -11,7 +11,7 @@ require 'testdata_generater_for_mysql'
 # 取り敢えずおまじない
 include TestdataGeneraterForMysql
 
-# データベースへのアクセス情報を設定します
+# データベースへのアクセス情報を設定します(Mysql2::Client.newの引数です)
 setup_mysql_client :host => "127.0.0.1", :username => "root",:database=>'testdata_generater_for_mysql_test'
 # マルチプルインサートの実行単位を指定します（以下だと200行ずつインサート実行。defaultは100）
 insert_per_rows 200
