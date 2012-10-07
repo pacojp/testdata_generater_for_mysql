@@ -5,16 +5,18 @@ require 'testdata_generater_for_mysql'
 
 #
 # localhostにtestdata_generater_for_mysql_testというデータベースを作成し
-# rootのパスワードなしでアクセスできるようにしておいてください
+# rootのパスワードなしでアクセスできるようにしてあるとして
 #
 
 include TestdataGeneraterForMysql
 
-CNT_BRAND      =  5
-SHOP_PER_BRAND =  6
-USER_PER_SHOP  = 22
+CNT_BRAND      =    21
+SHOP_PER_BRAND =    15
+USER_PER_SHOP  = 1_003
 
-client = setup_mysql_client :host => "127.0.0.1", :username => "root",:database=>'testdata_generater_for_mysql_test'
+# データベースへのアクセス情報を設定します
+setup_mysql_client :host => "127.0.0.1", :username => "root",:database=>'testdata_generater_for_mysql_test'
+# マルチプルインサートの実行単位を指定します
 insert_per_rows = 200
 
 # 取り敢えず必要なテーブルを再作成します
@@ -62,9 +64,9 @@ loops = [
 # 次に各列の処理を設定します。
 # データはハッシュにて設定します。設定したいカラムの名前をkeyにて設定、
 # valueはProcインスタンスにて設定します。Procのイニシャライザのブロック引数に
-# loopsで設定した値が引き渡されます(上記サンプルのso_somethingのところの値が
+# loopsで設定した値が引き渡されます(上記ループ解説の# do_somethingの箇所の値が
 # ハッシュにて引き渡されます)。
-# 基本的にvalueは自動的にエスケープされシングルクォーテーションで囲まれます。
+# 基本的にvalueは実行時にエスケープされシングルクォーテーションで囲まれます。
 # 「NOW()」等関数を指定したい場合は"NOW()".to_funcと指定すると値にエスケープ及び
 # シングルクォーテーションでの囲みがかからなくなります
 #
@@ -90,9 +92,22 @@ create_rows(
   procs
 )
 
+
 # 以下作成結果のサンプルを出力しています
 puts '=' * 60
 puts query("SELECT count(id) AS cnt FROM tests").first['cnt'].to_s + "rows created"
 puts 'sample:'
 p query("SELECT * FROM tests WHERE brand_id = #{CNT_BRAND} AND shop_id = #{SHOP_PER_BRAND} AND user_id = #{USER_PER_SHOP}").first
-puts '=' * 60
+
+__END__
+
+出力結果は以下な感じになります
+
+$ ruby example/sample1.rb
+================   create rows for tests   =================
+100% |oooooooooooooooooooooooooooooooooooo| Time:   0:00:23
+============================================================
+315945rows created
+sample:
+{"id"=>315945, "brand_id"=>21, "shop_id"=>15, "user_id"=>1003, "name"=>"21_15_1003's name", "value1"=>6704, "value_nil"=>nil, "value_func"=>"MySQL", "value_true"=>1, "value_time"=>2001-02-03 04:35:06 +0900, "created_at"=>2012-10-07 16:06:13 +0900}
+

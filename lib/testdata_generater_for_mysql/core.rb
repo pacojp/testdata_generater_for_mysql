@@ -86,7 +86,9 @@ module TestdataGeneraterForMysql
     @__inserted_rows = 0
     @__col_procs = col_procs
     unless @__disable_progress_bar
-      $stderr.puts "====== #{table_name} ======"
+      title = "create rows for #{table_name}"
+      width = 60
+      $stderr.puts title.center(title.size + 6,' ').center(width,'=')
       @__pbar = ProgressBar.new('', total_rows, $stderr)
       @__pbar.format_arguments = [:percentage, :bar, :stat] 
       @__pbar.format = "%3d%% %s %s"
