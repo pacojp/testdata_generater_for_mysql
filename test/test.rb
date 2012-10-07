@@ -21,9 +21,9 @@ class TestTestdataGeneraterForMysql < Test::Unit::TestCase
   STAMP_PER_USER =  3
 
   def setup
-    disable_progress_bar
+    hide_progress_bar
     setup_mysql_client :host => "127.0.0.1", :username => "root",:database=>'testdata_generater_for_mysql_test'
-    insert_per_rows = 29
+    insert_per_rows 29
     query "DROP TABLE IF EXISTS tests;"
   end
 

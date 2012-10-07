@@ -50,15 +50,22 @@ class String
 end
 
 module TestdataGeneraterForMysql
+
+  INSERT_PER_ROWS = 100
+
   def setup_mysql_client(hash)
     @__client = Mysql2::Client.new(hash)
   end
 
-  def insert_per_rows=(v)
+  def insert_per_rows(v)
     @__insert_per_rows = v
   end
 
-  def disable_progress_bar
+  def get_insert_per_rows
+    @__insert_per_rows ||= INSERT_PER_ROWS
+  end
+
+  def hide_progress_bar
     @__disable_progress_bar = true
   end
 
@@ -80,7 +87,6 @@ module TestdataGeneraterForMysql
       end
     end
     @__table_name = table_name
-    @__insert_per_rows ||= 100
     raise 'something wrong' if @__insert_values && @__insert_values.size > 0
     @__insert_values = []
     @__inserted_rows = 0
@@ -121,7 +127,7 @@ module TestdataGeneraterForMysql
   def set_insert_values(hash)
     @__insert_values ||= []
     @__insert_values << hash
-    if @__insert_values.size > @__insert_per_rows
+    if @__insert_values.size > get_insert_per_rows
       do_insert
     end
   end
