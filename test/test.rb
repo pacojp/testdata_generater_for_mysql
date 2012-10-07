@@ -65,7 +65,7 @@ CREATE TABLE tests (
     procs = {
       :brand_id    => Proc.new{|v|v[:brand_id]},
       :shop_id     => Proc.new{|v|v[:shop_id]},
-      :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:shop_id]}_name"},
+      :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:shop_id]}'s name"},
       :value1      => Proc.new{rand(10000)},
       :value2      => Proc.new{rand(10000)},
       :value_nil   => Proc.new{nil},
@@ -88,7 +88,7 @@ CREATE TABLE tests (
     assert_count cnt_all,        "value3 IS NULL"
     assert_count cnt_all,        "value_nil IS NULL"
     assert_count 0,              "created_at IS NULL"
-    assert_count 1,              "name = '1_1_name'"
+    assert_count 1,              "name = '1_1''s name'"
     assert_count cnt_all,        "value_true = 1"
     assert_count cnt_all,        "value_false = 0"
   end
@@ -127,7 +127,7 @@ CREATE TABLE tests (
       :shop_id     => Proc.new{|v|v[:shop_id]},
       :user_id     => Proc.new{|v|v[:user_id]},
       :stamp_id    => Proc.new{|v|v[:stamp_id]},
-      :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:shop_id]}_#{v[:user_id]}_#{v[:stamp_id]}_name"},
+      :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:shop_id]}_#{v[:user_id]}_#{v[:stamp_id]}'s name"},
       :value1      => Proc.new{rand(10000)},
       :value2      => Proc.new{rand(10000)},
       :value_nil   => Proc.new{nil},
@@ -152,7 +152,7 @@ CREATE TABLE tests (
     assert_count cnt_all,       "value3 IS NULL"
     assert_count cnt_all,       "value_nil IS NULL"
     assert_count 0,             "created_at IS NULL"
-    assert_count 1,             "name = '1_1_1_1_name'"
+    assert_count 1,             "name = '1_1_1_1''s name'"
     assert_count cnt_all,       "value_true = 1"
     assert_count cnt_all,       "value_false = 0"
     row = query("SELECT * FROM tests WHERE name = '1_1_1_1_name'").first
