@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = TestdataGeneraterForMysql::VERSION
   s.authors     = ["pacojp"]
   s.email       = ["paco.jp@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/pacojp/testdata_generater_for_mysql"
   s.summary     = %q{oreore mysql test data generater}
   s.description = %q{oreore mysql test data generater}
 
