@@ -8,11 +8,8 @@ require 'testdata_generater_for_mysql'
 # rootのパスワードなしでアクセスできるようにしてあるとして
 #
 
+# 取り敢えずおまじない
 include TestdataGeneraterForMysql
-
-CNT_BRAND      =    21
-SHOP_PER_BRAND =    15
-USER_PER_SHOP  = 1_003
 
 # データベースへのアクセス情報を設定します
 setup_mysql_client :host => "127.0.0.1", :username => "root",:database=>'testdata_generater_for_mysql_test'
@@ -55,6 +52,9 @@ CREATE TABLE tests (
 #
 # これを以下で表現しています。
 #
+CNT_BRAND      =    21
+SHOP_PER_BRAND =    15
+USER_PER_SHOP  = 1_003
 loops = [
   [:brand_id, (1..CNT_BRAND)],
   [:shop_id,  (1..SHOP_PER_BRAND)],
