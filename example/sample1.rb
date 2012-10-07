@@ -75,9 +75,9 @@ procs = {
   :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:shop_id]}_#{v['user_id']}'s name"},
   :value1      => Proc.new{rand(10000)},
   :value_nil   => Proc.new{nil},
-  :value_func  => Proc.new{"CONCAT('My', 'S', 'QL')".to_func},
-  :value_true  => Proc.new{true},
-  :value_time  => Proc.new{Time.mktime(2001,2,3,4,35,6)},
+  :value_func  => Proc.new{"CONCAT('My', 'S', 'QL')".to_func}, #関数指定時はString#to_funcで
+  :value_true  => Proc.new{true}, # true は 1 false は 0
+  :value_time  => Proc.new{Time.mktime(2001,2,3,4,35,6)}, # Time,DateTime,Date
   :created_at  => Proc.new{'NOW()'.to_func},
 }
 #
