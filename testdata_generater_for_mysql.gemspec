@@ -11,6 +11,9 @@ Gem::Specification.new do |s|
   s.summary     = %q{oreore mysql test data generater}
   s.description = %q{oreore mysql test data generater}
 
+  s.add_dependency 'mysql2'
+  s.add_dependency 'progressbar'
+
   s.rubyforge_project = "testdata_generater_for_mysql"
 
   s.files         = `git ls-files`.split("\n")
