@@ -33,10 +33,24 @@ require 'mysql2'
 #    :created_at=>Proc.new{'NOW()'},
 #  )
 #
-#
+
+class String
+  def to_func
+    @__is_function = true
+    self
+  end
+
+  def function?
+    if @__is_function
+      true
+    else
+      false
+    end
+  end
+end
 
 module TestdataGeneraterForMysql
-  def setup_mysql_settings(hash)
+  def setup_mysql_client(hash)
     @__client = Mysql2::Client.new(hash)
   end
 
@@ -48,8 +62,8 @@ module TestdataGeneraterForMysql
     @__disable_progress_bar = true
   end
 
-  def query(query)
-    @__client.query(query)
+  def query(q)
+    @__client.query(q)
   end
 
   def create_rows(table_name,loops,col_procs)
@@ -117,32 +131,37 @@ module TestdataGeneraterForMysql
 INSERT INTO `#{@__client.escape(@__table_name)}`
 (#{@__col_procs.keys.map{|o|"`#{@__client.escape(o.to_s)}`"}.join(',')})
 VALUES
-    #{
-    @__insert_values.map do |row|
-    "(#{
-      row.map do |key,value|
-        case value
-        when nil
-          "NULL"
-        when TrueClass,FalseClass
-          if value
-            "'1'"
-          else
-            "'0'"
-          end
-        # TODO when datetime time
+#{
+  @__insert_values.map do |row|
+  "(#{
+    row.map do |key,value|
+      case value
+      when nil
+        "NULL"
+      when TrueClass,FalseClass
+        if value
+          "'1'"
         else
-          case key.to_s
-          when /_at$/
-            "#{@__client.escape(value.to_s)}"
-          else
-            "'#{@__client.escape(value.to_s)}'"
-          end
+          "'0'"
         end
-      end.join(',')
-    })"
+      # TODO when datetime time
+      when Time,DateTime
+        "'#{value.strftime("%Y-%m-%d %H:%M:%S")}'"
+      when Date
+        "'#{value.strftime("%Y-%m-%d")}'"
+      else
+        s = value
+        s = s.to_s unless s.kind_of?(String)
+        if s.respond_to?(:function?) && s.function?
+          "#{value.to_s}"
+        else
+          "'#{@__client.escape(value.to_s)}'"
+        end
+      end
     end.join(',')
-    }
+  })"
+  end.join(',')
+}
 EOS
     @__client.query(query)
     if @__pbar
