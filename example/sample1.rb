@@ -73,16 +73,16 @@ loops = [
 # シングルクォーテーションでの囲みがかからなくなります
 #
 procs = {
-  :brand_id    => Proc.new{|v|v[:brand_id]},
-  :shop_id     => Proc.new{|v|v[:shop_id]},
-  :user_id     => Proc.new{|v|v['user_id']},
-  :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:shop_id]}_#{v['user_id']}'s name"},
-  :value1      => Proc.new{rand(10000)},
-  :value_nil   => Proc.new{nil},
-  :value_func  => Proc.new{"CONCAT('My', 'S', 'QL')".to_func}, #関数指定時はString#to_funcで
-  :value_true  => Proc.new{true}, # true は 1 false は 0
-  :value_time  => Proc.new{Time.mktime(2001,2,3,4,35,6)}, # Time,DateTime,Date
-  :created_at  => Proc.new{'NOW()'.to_func},
+  :brand_id    => proc{|v|v[:brand_id]},
+  :shop_id     => proc{|v|v[:shop_id]},
+  :user_id     => proc{|v|v['user_id']},
+  :name        => proc{|v|"#{v[:brand_id]}_#{v[:shop_id]}_#{v['user_id']}'s name"},
+  :value1      => proc{rand(10000)},
+  :value_nil   => proc{nil},
+  :value_func  => proc{"CONCAT('My', 'S', 'QL')".to_func}, #関数指定時はString#to_funcで
+  :value_true  => proc{true}, # true は 1 false は 0
+  :value_time  => proc{Time.mktime(2001,2,3,4,35,6)}, # Time,DateTime,Date
+  :created_at  => proc{'NOW()'.to_func},
 }
 #
 # 実際にテストデータを作成します
