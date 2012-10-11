@@ -148,6 +148,7 @@ CREATE TABLE tests (
       :value1      => Proc.new{rand(10000)},
       :value2      => Proc.new{rand(10000)},
       :value_nil   => Proc.new{nil},
+      #:value_func  => Proc.new{"CONCAT('My', 'S', 'QL')".to_func},
       :value_func  => Proc.new{"CONCAT('My', 'S', 'QL')".to_func},
       :value_true  => Proc.new{true},
       :value_false => Proc.new{false},

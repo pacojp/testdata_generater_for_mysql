@@ -5,3 +5,4 @@
 
 サンプル
 https://github.com/pacojp/testdata_generater_for_mysql/blob/master/example/sample1.rb
+

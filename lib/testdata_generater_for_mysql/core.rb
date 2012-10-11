@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 require 'progressbar'
-require 'mysql2'
+require 'mysql2wrapper'
+require 'logger'
 
 #
 # TODO 以下の削除 サンプルの作成
@@ -34,27 +35,13 @@ require 'mysql2'
 #  )
 #
 
-class String
-  def to_func
-    @__is_function = true
-    self
-  end
-
-  def function?
-    if @__is_function
-      true
-    else
-      false
-    end
-  end
-end
-
 module TestdataGeneraterForMysql
 
   INSERT_PER_ROWS = 100
 
   def setup_mysql_client(hash)
-    @__client = Mysql2::Client.new(hash)
+    @__client = Mysql2wrapper::Client.new(hash,nil)
+    #@__client = Mysql2wrapper::Client.new(hash)
   end
 
   def insert_per_rows(v)
@@ -134,47 +121,8 @@ module TestdataGeneraterForMysql
 
   def do_insert
     return if @__insert_values.size == 0
-    @__inserted_rows += @__insert_values.size
-    query = <<"EOS"
-INSERT INTO `#{@__client.escape(@__table_name)}`
-(#{@__col_procs.keys.map{|o|"`#{@__client.escape(o.to_s)}`"}.join(',')})
-VALUES
-#{
-  @__insert_values.map do |row|
-  "(#{
-    row.map do |key,value|
-      case value
-      when nil
-        "NULL"
-      when TrueClass,FalseClass
-        if value
-          "'1'"
-        else
-          "'0'"
-        end
-      # TODO when datetime time
-      when Time,DateTime
-        "'#{value.strftime("%Y-%m-%d %H:%M:%S")}'"
-      when Date
-        "'#{value.strftime("%Y-%m-%d")}'"
-      else
-        s = value
-        s = s.to_s unless s.kind_of?(String)
-        if s.respond_to?(:function?) && s.function?
-          "#{value.to_s}"
-        else
-          "'#{@__client.escape(value.to_s)}'"
-        end
-      end
-    end.join(',')
-  })"
-  end.join(',')
-}
-EOS
-    @__client.query(query)
-    if @__pbar
-      @__pbar.inc(@__insert_values.size)
-    end
+    @__client.insert(@__client.escape(@__table_name),@__insert_values)
+    @__pbar.inc(@__insert_values.size) if @__pbar
     @__insert_values = []
   end
 end

@@ -94,7 +94,6 @@ create_rows(
   procs
 )
 
-
 # 以下作成結果のサンプルを出力しています
 puts '=' * 60
 puts query("SELECT count(id) AS cnt FROM tests").first['cnt'].to_s + "rows created"
