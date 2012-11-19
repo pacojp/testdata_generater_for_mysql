@@ -56,6 +56,10 @@ module TestdataGeneraterForMysql
     @__disable_progress_bar = true
   end
 
+  def random_loop
+    @__random_loop = true
+  end
+
   def query(q)
     @__client.query(q)
   end
@@ -87,7 +91,11 @@ module TestdataGeneraterForMysql
       @__pbar.format = "%3d%% %s %s"
     end
 
-    looping(loops,0)
+    if @__random_loop
+      random_looping(loops,0)
+    else
+      looping(loops,0)
+    end
     do_insert # あまりの作成
 
     if @__pbar
@@ -95,13 +103,35 @@ module TestdataGeneraterForMysql
     end
   end
 
-  def looping(ar,index,values={})
-    ar[index][1].each do |i|
-      values[ar[index][0]] = i
+  def random_looping(loop_array,index,values={},array=[])
+    loop_array[index][1].each do |i|
+      values[loop_array[index][0]] = i
       next_index = index + 1
-      if ar.size > next_index
-        looping(ar,next_index,values)
-      elsif ar.size == next_index
+      if loop_array.size > next_index
+        random_looping(loop_array,next_index,values,array)
+      elsif loop_array.size == next_index
+        array << values.clone
+      end
+    end
+
+    if index == 0
+      array.shuffle.each do |values|
+        hash = {}
+        @__col_procs.each do |key,proc|
+          hash[key] = proc.call(values)
+        end
+        set_insert_values(hash)
+      end
+    end
+  end
+
+  def looping(loop_array,index,values={})
+    loop_array[index][1].each do |i|
+      values[loop_array[index][0]] = i
+      next_index = index + 1
+      if loop_array.size > next_index
+        looping(loop_array,next_index,values)
+      elsif loop_array.size == next_index
         hash = {}
         @__col_procs.each do |key,proc|
           hash[key] = proc.call(values)
@@ -135,7 +165,7 @@ module TestdataGeneraterForMysql
     end
   end
 
-  def test
+  def research
     yield
   end
 end

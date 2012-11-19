@@ -7,14 +7,14 @@ require 'testdata_generater_for_mysql'
 # データ作成は一度
 # テストはちょこちょこ更新して結果を調べたいって時は
 # データ作成ブロックをgenerate do テストブロックをtest do として作成。
-# スクリプト実行時に test_only or test or t とスクリプトの後の指定すれば
-# テストのみ実行します
+# スクリプト実行時に research_only or research or r とスクリプトの後の指定すれば
+# researchブロックのみ実行します
 #
 # ex.データ作成時
 # sample2.rb
 #
 # ex.テストのみ再実行
-# sample2.rb test
+# sample2.rb research
 #
 
 include TestdataGeneraterForMysql
@@ -78,7 +78,7 @@ CREATE TABLE tests (
   )
 end
 
-test do
+research do
   puts '=' * 60
   puts query("SELECT count(id) AS cnt FROM tests").first['cnt'].to_s + "rows created"
   puts 'sample:'

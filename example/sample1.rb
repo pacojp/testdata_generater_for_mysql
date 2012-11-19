@@ -15,6 +15,8 @@ include TestdataGeneraterForMysql
 setup_mysql_client :host => "127.0.0.1", :username => "root",:database=>'testdata_generater_for_mysql_test'
 # マルチプルインサートの実行単位を指定します（以下だと200行ずつインサート実行。defaultは100）
 insert_per_rows 200
+# ループをランダムで回します# メモリを食います(100万レコード作成でで500M程度〜)
+random_loop
 # プログレスバーを非表示にしたければ以下をコメントアウト
 #hide_progress_bar
 

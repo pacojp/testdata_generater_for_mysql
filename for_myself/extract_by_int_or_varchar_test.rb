@@ -41,7 +41,8 @@ CREATE TABLE #{TABLE} (
   KEY `idx_varchar_col` USING BTREE (`varchar_col`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 "
-
+  # ループランダムで回す(メモリを食います(100万レコードで500M〜))
+  random_loop
   loops = [
     [:parent, (1..CNT_PARENT)],
     [:child, (1..CNT_CHILD)],
@@ -61,7 +62,7 @@ CREATE TABLE #{TABLE} (
   )
 end
 
-test do
+research do
   samples = [1,11,19,8,2,16]
   Benchmark.bmbm do |x|
     x.report("int_col") do
@@ -83,6 +84,8 @@ __END__
 
 結果としては2倍程度のパフォーマンス差が出ました。
 結構悩ましい差かなと、、、、
+蛇足ですが、データ作成時にrandom_loopをつけても付けなくても
+結果は変わりませんでした（当たり前ですが）
 
 ===   create rows for extract_by_int_or_varchar_tests   ====
 100% |ooooooooooooooooooooooooooooooooooooooooooooo| Time:   0:01:32
