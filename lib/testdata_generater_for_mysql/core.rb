@@ -83,7 +83,7 @@ module TestdataGeneraterForMysql
       width = 60
       $stderr.puts title.center(title.size + 6,' ').center(width,'=')
       @__pbar = ProgressBar.new('', total_rows, $stderr)
-      @__pbar.format_arguments = [:percentage, :bar, :stat] 
+      @__pbar.format_arguments = [:percentage, :bar, :stat]
       @__pbar.format = "%3d%% %s %s"
     end
 
@@ -125,4 +125,20 @@ module TestdataGeneraterForMysql
     @__pbar.inc(@__insert_values.size) if @__pbar
     @__insert_values = []
   end
+
+  def generate
+    only_test = ARGV.size == 1 && %w|test only_test t|.include?(ARGV[0])
+    if only_test
+      puts 'skip generate test datas!'
+    else
+      yield
+    end
+  end
+
+  def test
+    yield
+  end
 end
+
+
+
