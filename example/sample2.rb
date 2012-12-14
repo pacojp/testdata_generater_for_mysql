@@ -7,7 +7,7 @@ require 'testdata_generater_for_mysql'
 # データ作成は一度
 # テストはちょこちょこ更新して結果を調べたいって時は
 # データ作成ブロックをgenerate do テストブロックをtest do として作成。
-# スクリプト実行時に research_only or research or r とスクリプトの後の指定すれば
+# スクリプト実行時に test_only or test or t とスクリプトの後の指定すれば
 # researchブロックのみ実行します
 #
 # ex.データ作成時
