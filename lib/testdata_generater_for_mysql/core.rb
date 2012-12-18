@@ -64,6 +64,29 @@ module TestdataGeneraterForMysql
     @__client.query(q)
   end
 
+  def dump_file_name(table)
+    "/tmp/.testdata_generater_for_mysql.#{table}.dump"
+  end
+
+
+  def load_table(table)
+    file = dump_file_name(table)
+    if File.exists?(file)
+      cmd = "cat '#{file}' | mysql -u root --database '#{@__client.config[:database]}'"
+      `#{cmd}`
+      true
+    else
+      false
+    end
+  end
+
+  def save_table(table)
+    file = dump_file_name(table)
+    `rm #{file}` if File.exists?(file)
+    cmd = "mysqldump -u root --database '#{@__client.config[:database]}' --tables '#{table}' > '#{file}'"
+    `#{cmd}`
+  end
+
   def create_rows(table_name,loops,col_procs)
     if loops.size == 0
       raise 'loops size must be bigger than 0'

@@ -261,4 +261,69 @@ CREATE TABLE tests (
     assert_not_equal SHOP_PER_BRAND, result.to_a.select{|o|o['brand_id'] == 1}.size,"error!! or maybe miracle.... (1/#{CNT_BRAND**SHOP_PER_BRAND})"
   end
 
+  def test_load_and_save_table
+    dump_file = dump_file_name('tests')
+    if File.exists?(dump_file)
+      `rm #{dump_file}`
+    end
+    assert_equal false, File.exists?(dump_file)
+    assert_equal false, load_table('tests')
+    assert_equal false, table?('tests')
+
+    create_test_data
+    assert_equal true, table?('tests')
+    save_table('tests')
+    assert_equal true, table?('tests')
+
+    assert_equal true, File.exists?(dump_file)
+    cnt_all = CNT_BRAND * SHOP_PER_BRAND
+    assert_count cnt_all
+    query "DROP TABLE IF EXISTS tests;"
+    assert_equal false, table?('tests')
+    assert_equal true, load_table('tests')
+    assert_equal true, table?('tests')
+    assert_count cnt_all
+    query "DELETE FROM tests limit 1"
+    assert_count cnt_all - 1
+    save_table('tests')
+    load_table('tests')
+    assert_count cnt_all - 1
+  end
+
+  # テーブルあんの？
+  def table?(table)
+    @__client.table_informations.map{|o|o['TABLE_NAME']}.include?(table)
+  end
+
+  def create_test_data
+    # テーブル作成
+    query "
+CREATE TABLE tests (
+  `id`          int(11) NOT NULL auto_increment,
+  `brand_id`    int(11) NOT NULL,
+  `shop_id`     int(11) NOT NULL,
+  `name`        varchar(20) NOT NULL,
+  `created_at`  datetime ,
+  PRIMARY KEY  (`id`),
+  KEY `idx01` USING BTREE (`brand_id`,`shop_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+"
+
+    # データ作成
+    loops = [
+      [:brand_id, (1..CNT_BRAND)],
+      [:shop_id,  (1..SHOP_PER_BRAND)]
+    ]
+    procs = {
+      :brand_id    => Proc.new{|v|v[:brand_id]},
+      :shop_id     => Proc.new{|v|v[:shop_id]},
+      :name        => Proc.new{|v|"#{v[:brand_id]}_#{v[:shop_id]}'s name"},
+      :created_at  => Proc.new{'NOW()'.to_func},
+    }
+    create_rows(
+      'tests',
+      loops,
+      procs
+    )
+  end
 end
