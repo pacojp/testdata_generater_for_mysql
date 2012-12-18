@@ -27,17 +27,11 @@ WITHOUT_PKEY  = 'delete_without_pkey'
 #CNT_PARENT = 100_000
 #CHANGE_POINT = 50_000
 
-CNT_PARENT = 400
-CHANGE_POINT = 200
+CNT_PARENT = 400_000
+#CHANGE_POINT = 200_000 # インデックスが効かないサイズ（delete 関係ないけど）
+CHANGE_POINT = 20_000 # インデックスが効くサイズ(delete 関係ないけど)
 
-def varchar_col_value(i)
-  i.to_s.rjust(10,'0')
-end
-
-def create_data
-  return if load_table(WITH_PKEY) && load_table(WITHOUT_PKEY)
-  query "DROP TABLE IF EXISTS #{WITH_PKEY};"
-  query "
+CREATE_TABLE_WITH_PKEY = "
 CREATE TABLE #{WITH_PKEY} (
   `id`          bigint(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `json`        text NOT NULL,
@@ -46,15 +40,25 @@ CREATE TABLE #{WITH_PKEY} (
   INDEX `idx01` (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 "
-
-  query "DROP TABLE IF EXISTS #{WITHOUT_PKEY};"
-  query "
+CREATE_TABLE_WITHOUT_PKEY = "
 CREATE TABLE #{WITHOUT_PKEY} (
   `json`        text NOT NULL,
   `created_at`  datetime ,
   INDEX `idx01` (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 "
+
+def varchar_col_value(i)
+  i.to_s.rjust(10,'0')
+end
+
+def create_data
+  return if load_table(WITH_PKEY) && load_table(WITHOUT_PKEY)
+  query "DROP TABLE IF EXISTS #{WITH_PKEY};"
+  query CREATE_TABLE_WITH_PKEY
+
+  query "DROP TABLE IF EXISTS #{WITHOUT_PKEY};"
+  query CREATE_TABLE_WITHOUT_PKEY
 
   # ループランダムで回す(メモリを食います(100万レコードで500M〜))
   #random_loop
@@ -103,6 +107,10 @@ end
 
 TITLE_LENGTH = 70
 
+puts '# 主キーなしテーブルスキーマ' + CREATE_TABLE_WITH_PKEY
+puts ''
+puts '# 主キーありテーブルスキーマ' + CREATE_TABLE_WITHOUT_PKEY
+
 research do
   create_data
   Benchmark.bm(TITLE_LENGTH) do |x|
@@ -142,3 +150,55 @@ research do
     end
   end
 end
+
+__END__
+
+# 考察
+
+idいらないな、、、
+削除対象データが増えれば増えるほどid指定のほうが早く消せそうだけど、
+実際idで決めきるのは危ういし（fluentdの受けたデータのcreated_atがテーブルの
+created_atになるし）
+
+
+
+
+# 以下ベンチマークデータ
+
+# 主キーなしテーブルスキーマ
+CREATE TABLE delete_with_pkey (
+  `id`          bigint(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `json`        text NOT NULL,
+  `created_at`  datetime ,
+  PRIMARY KEY  (`id`),
+  INDEX `idx01` (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+# 主キーありテーブルスキーマ
+CREATE TABLE delete_without_pkey (
+  `json`        text NOT NULL,
+  `created_at`  datetime ,
+  INDEX `idx01` (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+# 40万件中20万件が削除対象の場合
+                                                                             user     system      total        real
+DELETE FROM delete_with_pkey                                             0.000000   0.000000   0.000000 ( 26.199604)
+DELETE FROM delete_without_pkey                                          0.000000   0.000000   0.000000 ( 30.180462)
+                                                                             user     system      total        real
+DELETE FROM delete_with_pkey WHERE created_at < current_date()           0.000000   0.000000   0.000000 ( 13.148196)
+DELETE FROM delete_without_pkey WHERE created_at < current_date()        0.000000   0.000000   0.000000 ( 15.285352)
+                                                                             user     system      total        real
+DELETE FROM delete_with_pkey WHERE id < 200000                           0.000000   0.000000   0.000000 ( 13.283233)
+DELETE FROM delete_without_pkey WHERE created_at < current_date()        0.000000   0.000000   0.000000 ( 15.556888)
+
+# 40万件中2万件が削除対象の場合
+
+DELETE FROM delete_with_pkey                                             0.000000   0.000000   0.000000 ( 25.730908)
+DELETE FROM delete_without_pkey                                          0.000000   0.000000   0.000000 ( 29.957081)
+                                                                             user     system      total        real
+DELETE FROM delete_with_pkey WHERE created_at < current_date()           0.000000   0.000000   0.000000 (  0.224491)
+DELETE FROM delete_without_pkey WHERE created_at < current_date()        0.000000   0.000000   0.000000 (  0.228848)
+                                                                             user     system      total        real
+DELETE FROM delete_with_pkey WHERE id < 20000                            0.000000   0.000000   0.000000 (  1.312694)
+DELETE FROM delete_without_pkey WHERE created_at < current_date()        0.000000   0.010000   0.010000 (  0.200570)
